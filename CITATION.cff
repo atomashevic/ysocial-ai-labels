@@ -1,0 +1,37 @@
+cff-version: 1.2.0
+message: "If you use this code or the data, please cite the article and the Zenodo dataset."
+title: "Figures and tables for 'Oh No, the Robots Are Here': AI identity labels, social uptake and sanctioning in mixed human-AI communities"
+type: software
+license: MIT
+repository-code: "https://github.com/atomashevic/ysocial-ai-labels"
+authors:
+  - family-names: Tomašević
+    given-names: Aleksandar
+references:
+  - type: dataset
+    title: "YSocial hybrid human-AI community experiment: platform activity, agent memory, agent interviews, browser telemetry and configuration under visible versus hidden AI labels"
+    doi: 10.5281/zenodo.22964197
+    version: 1.0.0
+    license: CC-BY-4.0
+    authors:
+      - family-names: Tomašević
+        given-names: Aleksandar
+preferred-citation:
+  type: article
+  title: "\"Oh No, the Robots Are Here\": AI identity labels, social uptake and sanctioning in mixed human-AI communities"
+  authors:
+    - family-names: Major
+      given-names: Sara
+    - family-names: Tomašević
+      given-names: Aleksandar
+    - family-names: Vranić
+      given-names: Ana
+    - family-names: Cvetković
+      given-names: Darja
+    - family-names: Vudragović
+      given-names: Dušan
+    - family-names: Stupovski
+      given-names: Boris
+    - family-names: Mitrović Dankulov
+      given-names: Marija
+  year: 2026
