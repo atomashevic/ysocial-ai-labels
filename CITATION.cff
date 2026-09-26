@@ -7,6 +7,8 @@ repository-code: "https://github.com/atomashevic/ysocial-ai-labels"
 authors:
   - family-names: Tomašević
     given-names: Aleksandar
+    affiliation: Institute of Physics Belgrade
+    orcid: "https://orcid.org/0000-0003-4863-6051"
 references:
   - type: dataset
     title: "YSocial hybrid human-AI community experiment: platform activity, agent memory, agent interviews, browser telemetry and configuration under visible versus hidden AI labels"
@@ -16,6 +18,32 @@ references:
     authors:
       - family-names: Tomašević
         given-names: Aleksandar
+        affiliation: Institute of Physics Belgrade
+        orcid: "https://orcid.org/0000-0003-4863-6051"
+      - family-names: Major
+        given-names: Sara
+        affiliation: University of Novi Sad
+        orcid: "https://orcid.org/0009-0008-7901-5489"
+      - family-names: Vranić
+        given-names: Ana
+        affiliation: Institute of Physics Belgrade
+        orcid: "https://orcid.org/0000-0002-8729-654X"
+      - family-names: Cvetković
+        given-names: Darja
+        affiliation: Institute of Physics Belgrade
+        orcid: "https://orcid.org/0000-0002-3649-719X"
+      - family-names: Vudragović
+        given-names: Dušan
+        affiliation: Institute of Physics Belgrade
+        orcid: "https://orcid.org/0000-0001-5735-3198"
+      - family-names: Stupovski
+        given-names: Boris
+        affiliation: Institute of Physics Belgrade
+        orcid: "https://orcid.org/0009-0009-5610-0012"
+      - family-names: Mitrović Dankulov
+        given-names: Marija
+        affiliation: Institute of Physics Belgrade
+        orcid: "https://orcid.org/0000-0002-8484-3501"
 preferred-citation:
   type: article
   title: "\"Oh No, the Robots Are Here\": AI identity labels, social uptake and sanctioning in mixed human-AI communities"
