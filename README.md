@@ -17,6 +17,8 @@ python -m repro.download   # fetches 07_annotations and 08_analysis_ready (~2 MB
 python -m repro            # writes every figure and table into output/
 ```
 
+`requirements.txt` gives minimum versions. `requirements-lock.txt` pins the exact versions the code was last tested with (Python 3.13).
+
 `python -m repro.download --all` fetches the complete record (about 130 MB). Every unpacked file is checked against the record's `SHA256SUMS`. To use a copy of the record you already have, set `YSOCIAL_DATA_DIR` to its unpacked directory.
 
 ## What each script produces
