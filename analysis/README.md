@@ -26,11 +26,11 @@ Fits used 4 chains with 1,000 warm-up and 1,000 retained draws, target acceptanc
 
 ## Inputs
 
-`analysis.yaml` points to the study's processed tables, which are not public in that form. The de-identified versions are in the Zenodo record under `08_analysis_ready/canonical/` (`snapshot_contents.csv`, `snapshot_events.csv`, `snapshot_user_reputation.csv`). Running the preparation code on those tables reproduces the published RQ1 choice sets (2,143 replies, 17,489 candidates, identical attrition), the RQ2 history-support table, and the RQ3 reply panel (2,547 rows, identical cell counts and round timestamps).
+`analysis.yaml` points to the study's processed tables, which are not public in that form. The de-identified versions are in the Zenodo record under `08_analysis_ready/canonical/` (`snapshot_contents.csv`, `snapshot_events.csv`, `snapshot_user_reputation.csv`). Running the preparation code on those tables reproduces the published RQ1 choice sets row for row (2,143 replies, 17,489 candidates, identical attrition), the RQ2 history-support table, and the RQ3 reply panel (2,547 rows, identical cell counts and round timestamps).
 
 Some inputs are not in record version 1.0.0:
 
-- **Thread topics for RQ1 and RQ2.** M1 and the RQ2 model include a topic-varying slope for AI authorship, read from a legacy panel. Without it, every thread is untagged and the topic effect drops out. The topic of each root post can be rebuilt from `02_platform_activity/posts.csv`, `post_topics.csv` and `01_accounts/interests.csv`.
+- **Thread topics for RQ2.** The RQ2 model includes a topic-varying slope for AI authorship (45 topic levels), read from a legacy panel. Without it, every thread is untagged and the topic effect drops out. The reported RQ1 M1 fit has no topic term, so the record's tables reproduce its input exactly (same 17,489 candidate rows and covariates).
 - **Criticism labels for RQ3.** The criticism model uses thread-context labels from a later labelling run. The record contains the earlier labelling (`07_annotations/llm_annotations/interlocutor_measures.csv`) and the human validation sample only.
 - **Downvote panel for the exploratory interaction model.** The model reads a reply-event panel written by `estimate-rq3`; it is not deposited.
 - **Browser telemetry for direct thread entry.** The record's `05_browser_telemetry/` files use different names and columns from the private session tables the code reads.
