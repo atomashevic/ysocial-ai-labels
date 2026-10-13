@@ -22,6 +22,7 @@ Fits used 4 chains with 1,000 warm-up and 1,000 retained draws, target acceptanc
 | RQ3 downvotes, Table 2, Tables S13, S19 | Windowed outcomes and bootstrap contrasts | `scripts/publication_analysis/rq3.py` | `prepare-rq3`, `estimate-rq3`, `validate-rq3` |
 | RQ3 downvotes, Table 2b | Exploratory Bayesian interaction | `scripts/diagnostics/rq3_interaction.py` | `python -m scripts.diagnostics.rq3_interaction --panel PANEL --run-id ID` |
 | RQ3 criticism, Table 2, Tables S17–S18 | Criticism model and sensitivities | `scripts/diagnostics/annotation_models.py` (`build_model`), panels in `annotation_panels.py` and `sol_criticism.py`, sensitivities in `criticism_sensitivities.py` | `python -m scripts.diagnostics.annotation_models fit --analysis criticism` |
+| Sample size, Supplementary Note (retrospective sensitivity to reply-choice differences) | Fixed-scale Laplace refits of the reply-target choice model on simulated choices; 200 datasets per imposed difference. The refits include the topic-varying AI slope, with variance scales from an earlier M1 fit that contained it | `scripts/diagnostics/reply_observed_design.py`; settings in the `reply_observed_design_sensitivity` block of `analysis.yaml` | `python scripts/diagnostics/reply_observed_design.py --config analysis.yaml --root . --output DIR` |
 | Annotation | Language-model labelling prompts and runners (local Ollama endpoint) | `scripts/diagnostics/annotate_interlocutors.py`, `annotate_recommendations.py`, `classify_requests.py` | — |
 
 ## Inputs

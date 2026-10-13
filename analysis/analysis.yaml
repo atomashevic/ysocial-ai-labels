@@ -49,3 +49,19 @@ analysis:
       rq3:
         bootstrap_reps: 200
     release: {}
+
+reply_observed_design_sensitivity:
+  run_id: reply_observed_design_20260918
+  source_directory: outputs/publication_analysis/valid21_opportunity_network
+  differences:
+  - 0.0
+  - 0.025
+  - 0.035
+  - 0.05
+  baseline_probability: 0.29
+  repetitions: 200
+  seed: 20260920
+  alpha: 0.05
+  prior_focal_sigma: 1.0
+  prior_adjustment_sigma: 0.5
+  max_iterations: 1000
