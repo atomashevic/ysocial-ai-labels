@@ -56,7 +56,7 @@ The tables, grouped by what they report:
 
 ## Scope
 
-The figures and tables are built from `08_analysis_ready/results_tables/` in the Zenodo record. Those files hold the posterior summaries, diagnostics and counts produced by the study's analysis pipeline. The Bayesian models are not refitted here. The canonical input tables for the models are in the same record under `08_analysis_ready/canonical/`.
+The figures and tables are built from `08_analysis_ready/results_tables/` in the Zenodo record. Those files hold the posterior summaries, diagnostics and counts produced by the study's analysis pipeline. The Bayesian models are not refitted by `repro`; the code that fitted them is in [`analysis/`](analysis/README.md), with a table of which file fits which model. The canonical input tables for the models are in the same record under `08_analysis_ready/canonical/`.
 
 Rebuilt tables were checked number by number against the manuscript, and the figures against the manuscript figures. `pytest` checks a set of headline values. A few printed items cannot be rebuilt from the deposited summaries:
 
