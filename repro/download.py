@@ -2,15 +2,18 @@
 """Download the Zenodo record, unpack it into ``data/`` and verify every file.
 
 By default only the two archives the figures and tables read are fetched
-(``07_annotations.zip`` and ``08_analysis_ready.zip``, about 2 MB). ``--all``
-fetches the complete record (about 130 MB). Unpacked files are checked
-against the record's ``SHA256SUMS``.
+(``07_annotations.zip`` and ``08_analysis_ready.zip``, about 3 MB). ``--fit``
+adds the browser telemetry and experiment configuration that the model refits
+in ``analysis/`` also read (about 70 MB). ``--all`` fetches the complete record (about 130 MB). The newest
+published version of the record is used unless ``--record`` names a version.
+Unpacked files are checked against the record's ``SHA256SUMS``.
 """
 
 from __future__ import annotations
 
 import argparse
 import hashlib
+import json
 import shutil
 import sys
 import urllib.request
@@ -20,31 +23,38 @@ from typing import Sequence
 
 from repro.paths import DATA_DIR
 
-RECORD_ID = "22964197"
+RECORD_ID = "22964197"  # version 1.0.0; later versions are found through /versions/latest
 API = "https://zenodo.org/api/records"
 REQUIRED = ("07_annotations.zip", "08_analysis_ready.zip")
+FIT = ("05_browser_telemetry.zip", "06_experiment_config.zip", *REQUIRED)
 ALL = (
     "00_study.zip", "01_accounts.zip", "02_platform_activity.zip", "03_agent_memory.zip",
     "04_agent_interviews.zip", "05_browser_telemetry.zip", "06_experiment_config.zip",
     "07_annotations.zip", "08_analysis_ready.zip", "scripts.zip",
-    "README.md", "CODEBOOK.md", "CHANGELOG.md", "LICENSE.md", "VALIDATION.md", "BUILD_LOG.txt",
-    "datapackage.json", "row_counts.json",
+    "README.md", "CODEBOOK.md", "LICENSE.md", "datapackage.json",
 )
 
 
-def file_url(key: str, token: str | None) -> str:
+def latest_record() -> tuple[str, str]:
+    """Return the id and version string of the newest published version."""
+    with urllib.request.urlopen(f"{API}/{RECORD_ID}/versions/latest") as response:
+        record = json.load(response)
+    return str(record["id"]), str(record.get("metadata", {}).get("version", "unknown"))
+
+
+def file_url(record: str, key: str, token: str | None) -> str:
     if token:  # unpublished draft opened through a Zenodo share link
-        return f"{API}/{RECORD_ID}/draft/files/{key}/content?token={token}"
-    return f"{API}/{RECORD_ID}/files/{key}/content"
+        return f"{API}/{record}/draft/files/{key}/content?token={token}"
+    return f"{API}/{record}/files/{key}/content"
 
 
-def fetch(key: str, dest: Path, token: str | None) -> Path:
+def fetch(record: str, key: str, dest: Path, token: str | None) -> Path:
     target = dest / key
     if target.exists():
         return target
     print(f"downloading {key}", file=sys.stderr)
     partial = target.with_suffix(target.suffix + ".part")
-    with urllib.request.urlopen(file_url(key, token)) as response, partial.open("wb") as handle:
+    with urllib.request.urlopen(file_url(record, key, token)) as response, partial.open("wb") as handle:
         shutil.copyfileobj(response, handle)
     partial.rename(target)
     return target
@@ -76,17 +86,27 @@ def verify(dest: Path, prefixes: Sequence[str]) -> int:
 
 def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    parser.add_argument("--all", action="store_true", help="download the complete record")
+    scope = parser.add_mutually_exclusive_group()
+    scope.add_argument("--all", action="store_true", help="download the complete record")
+    scope.add_argument("--fit", action="store_true", help="also download the browser telemetry and configuration read by the model refits")
     parser.add_argument("--dest", type=Path, default=DATA_DIR, help=f"target directory (default: {DATA_DIR})")
-    parser.add_argument("--token", help="Zenodo share-link token, only needed before the record is published")
+    parser.add_argument("--record", help="Zenodo record id of one version (default: the newest published version)")
+    parser.add_argument("--token", help="Zenodo share-link token for an unpublished draft; give its id with --record")
     args = parser.parse_args(argv)
 
+    if args.record:
+        record = args.record
+    elif args.token:
+        record = RECORD_ID
+    else:
+        record, version = latest_record()
+        print(f"Zenodo record {record}, version {version}", file=sys.stderr)
     args.dest.mkdir(parents=True, exist_ok=True)
-    keys = ALL if args.all else REQUIRED
-    fetch("SHA256SUMS", args.dest, args.token)
+    keys = ALL if args.all else (FIT if args.fit else REQUIRED)
+    fetch(record, "SHA256SUMS", args.dest, args.token)
     prefixes = []
     for key in keys:
-        path = fetch(key, args.dest, args.token)
+        path = fetch(record, key, args.dest, args.token)
         if path.suffix == ".zip":
             with zipfile.ZipFile(path) as archive:
                 archive.extractall(args.dest)

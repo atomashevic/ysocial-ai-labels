@@ -6,8 +6,15 @@ pandas==2.2.3
 pyarrow==22.0.0
 statsmodels==0.14.6
 networkx==3.4.2
-scipy
-scikit-learn
-patsy
-pyyaml
-matplotlib
+# Versions below are those of the study environment. The October 2026 refits from the public
+# record used Python 3.11.16, scipy 1.17.1, xarray 2026.9.0, scikit-learn 1.9.1, patsy 1.0.3,
+# pyyaml 6.0.3 and matplotlib 3.11.2, and the other versions as listed.
+pytensor==2.38.3
+xarray==2026.4.0
+h5netcdf==1.8.1
+scipy==1.15.2
+scikit-learn==1.7.2
+patsy==1.0.2
+pyyaml==6.0.2
+matplotlib==3.10.0
+tabulate==0.9.0

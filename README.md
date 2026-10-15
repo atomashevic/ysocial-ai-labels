@@ -13,13 +13,13 @@ Requires Python 3.10 or later. Figure 1 also needs `rsvg-convert` from librsvg (
 ```bash
 python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
-python -m repro.download   # fetches 07_annotations and 08_analysis_ready (~2 MB) into data/
+python -m repro.download   # fetches 07_annotations and 08_analysis_ready (~3 MB) into data/
 python -m repro            # writes every figure and table into output/
 ```
 
 `requirements.txt` gives minimum versions. `requirements-lock.txt` pins the exact versions the code was last tested with (Python 3.13).
 
-`python -m repro.download --all` fetches the complete record (about 130 MB). Every unpacked file is checked against the record's `SHA256SUMS`. To use a copy of the record you already have, set `YSOCIAL_DATA_DIR` to its unpacked directory.
+`python -m repro.download --all` fetches the complete record (about 130 MB), and `--fit` adds the browser telemetry and experiment configuration the model refits need (about 70 MB). The newest published version of the record is used unless `--record` names one. Every unpacked file is checked against the record's `SHA256SUMS`. To use a copy of the record you already have, set `YSOCIAL_DATA_DIR` to its unpacked directory.
 
 ## What each script produces
 
@@ -56,7 +56,7 @@ The tables, grouped by what they report:
 
 ## Scope
 
-The figures and tables are built from `08_analysis_ready/results_tables/` in the Zenodo record. Those files hold the posterior summaries, diagnostics and counts produced by the study's analysis pipeline. The Bayesian models are not refitted by `repro`; the code that fitted them is in [`analysis/`](analysis/README.md), with a table of which file fits which model. The canonical input tables for the models are in the same record under `08_analysis_ready/canonical/`.
+The figures and tables are built from `08_analysis_ready/results_tables/` in the Zenodo record. Those files hold the posterior summaries, diagnostics and counts produced by the study's analysis pipeline. The Bayesian models are not refitted by `repro`; the code that fitted them is in [`analysis/`](analysis/README.md), with a table of which file fits which model and the commands that refit each model from record version 1.1.0 or later. The canonical input tables for the models are in the same record under `08_analysis_ready/canonical/`, and the other model inputs under `08_analysis_ready/model_inputs/`, `07_annotations/llm_annotations/criticism_labels.csv` and `05_browser_telemetry/`.
 
 Rebuilt tables were checked number by number against the manuscript, and the figures against the manuscript figures. `pytest` checks a set of headline values. A few printed items cannot be rebuilt from the deposited summaries:
 
