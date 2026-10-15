@@ -1,0 +1,67 @@
+project:
+  id: ysocial-experiment
+  title: YSocial cTrust transparency experiment
+
+analysis:
+  default_profile: release
+  inputs:
+    processed_dir: data/processed/ysocial_grupa1_grupa2_clean21_dataset_2026-06-10T09-44-59_0200
+    source_manifest: data/raw/datasets/ysocial_grupa1_grupa2_clean21_dataset_2026-06-10T09-44-59_0200/metadata/manifest.json
+    browser_dir: outputs/session_tracking/full_export_2026-06-15_moveo_corrected
+    legacy_tables_dir: outputs/tables/snapshot_2026-06-10T09-44-59_0200_primary_valid
+  output_root: runs
+  analysis_stage: rq1_m1
+  analysis_set: primary_valid
+  window:
+    start: "2026-05-11 08:00:00+02:00"
+    end: null
+    valid_days: [2, 3, 4, 5, 6, 7, 8, 9, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30]
+  seed: 20260715
+  sampling:
+    draws: 1000
+    tune: 1000
+    chains: 4
+    target_accept: 0.95
+    prior_focal_sigma: 1.0
+    prior_adjustment_sigma: 0.5
+    prior_scale_sigma: 0.5
+  browser_gates:
+    manual_audit_per_arm: 100
+    interval_audit_per_arm: 100
+    min_manual_precision: 0.95
+    min_pre_action_linkage: 0.90
+    max_arm_linkage_gap: 0.05
+    min_interval_closure: 0.90
+    action_tolerance_seconds: 30.0
+  latent_block_sizes: [2, 3]
+  rq3:
+    horizons_hours: [24, 48]
+    bootstrap_reps: 2000
+    round_start_time: "2026-05-09T16:00:00+02:00"
+    first_experiment_round: 2
+  profiles:
+    pilot:
+      sampling:
+        draws: 50
+        tune: 50
+        chains: 2
+        target_accept: 0.90
+      rq3:
+        bootstrap_reps: 200
+    release: {}
+
+reply_observed_design_sensitivity:
+  run_id: reply_observed_design_20260918
+  source_directory: outputs/publication_analysis/valid21_opportunity_network
+  differences:
+  - 0.0
+  - 0.025
+  - 0.035
+  - 0.05
+  baseline_probability: 0.29
+  repetitions: 200
+  seed: 20260920
+  alpha: 0.05
+  prior_focal_sigma: 1.0
+  prior_adjustment_sigma: 0.5
+  max_iterations: 1000
