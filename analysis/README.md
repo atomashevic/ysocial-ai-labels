@@ -1,6 +1,6 @@
 # Model-fitting code
 
-This folder holds the code that prepared the analysis tables and fitted the Bayesian models reported in the paper. It is copied unchanged from the study's analysis repository at commit `40c425c`, so the script hashes recorded in the run manifests still match. The figures and tables in `../repro/` are built from the posterior summaries this code wrote, which are deposited in the Zenodo record under `08_analysis_ready/results_tables/`.
+This folder holds the code that prepared the analysis tables and fitted the Bayesian models reported in the paper. The code of the main analyses is copied unchanged from the study's analysis repository at commit `40c425c`, so the script hashes recorded in the run manifests still match. The scripts of the further checks in Supplementary Note 11 (`scripts/diagnostics/chb_prereview_*.py` and the `review_*.py` modules they import) come from commit `0b2e781`, with input and output paths changed to this repository's layout; see [Further checks](#further-checks-supplementary-note-11). The figures and tables in `../repro/` are built from the posterior summaries this code wrote, which are deposited in the Zenodo record under `08_analysis_ready/results_tables/`.
 
 Run everything from this folder, with the environment in `requirements-fit.txt`:
 
@@ -24,6 +24,7 @@ Fits used 4 chains with 1,000 warm-up and 1,000 retained draws, target acceptanc
 | RQ3 criticism, Table 2, Tables S17–S18 | Criticism model and sensitivities | `scripts/diagnostics/annotation_models.py` (`build_model`), panels in `annotation_panels.py` and `sol_criticism.py`, sensitivities in `criticism_sensitivities.py` | `python -m scripts.diagnostics.annotation_models fit --analysis criticism` |
 | Sample size, Supplementary Note (retrospective sensitivity to reply-choice differences) | Fixed-scale Laplace refits of the reply-target choice model on simulated choices; 200 datasets per imposed difference. The refits include the topic-varying AI slope, with variance scales from an earlier M1 fit that contained it | `scripts/diagnostics/reply_observed_design.py`; settings in the `reply_observed_design_sensitivity` block of `analysis.yaml` | `python scripts/diagnostics/reply_observed_design.py --config analysis.yaml --root . --output DIR` |
 | Annotation | Language-model labelling prompts and runners (local Ollama endpoint) | `scripts/diagnostics/annotate_interlocutors.py`, `annotate_recommendations.py`, `classify_requests.py` | — |
+| Supplementary Note 11 | Further checks of the main contrasts and of AI conduct | `scripts/diagnostics/chb_prereview_*.py` | see [Further checks](#further-checks-supplementary-note-11) |
 
 ## Refitting from the public record
 
@@ -49,6 +50,49 @@ The commands below use the reported sampler settings (4 chains, 1,000 warm-up an
 | Sample-size simulation | `python scripts/diagnostics/reply_observed_design.py --config analysis.public-rq1.yaml --root . --output public_runs/reply_observed_design` | `public_inputs.py` rebuilds the source folder from `model_inputs/reply_observed_design_frame.csv` and `reply_observed_design_scales.json`; the script reads back the same four variance scales and ten terms as the reported run. |
 
 Checks against the reported results, October 2026 (staged record 1.1.0, Linux x86-64): the RQ3 estimate tables and all outputs of the sample-size simulation were byte-identical to the reported ones, the direct thread-entry panel had the reported hash, and `validate-rq3` passed all nine gates. Refits at the reported settings agreed with the reported estimates within Monte Carlo error: RQ1 hidden-minus-visible contrast from the main M1 fit +3.48 percentage points (95% CrI +0.63 to +6.30; reported +3.49, +0.51 to +6.50; the rest of the RQ1 stage was not rerun to completion), criticism interaction +13.39 (+5.30 to +21.17; reported +13.28), exploratory downvote interaction +2.35 (+0.34 to +4.42; reported +2.31), and direct thread entry +4.41 (+0.69 to +8.15; reported +4.41, +0.81 to +8.10). A short RQ2 run (2 chains, 300 draws) gave all six prior-contact estimands within 0.11 points of the reported medians. Posterior draws are not bit-identical across machines, so a sampler gate near its threshold can fail on a rerun (the exploratory downvote model's primary fit reached R-hat 1.012 against the 1.01 gate).
+
+## Further checks (Supplementary Note 11)
+
+Supplementary Note 11 reports further checks of the main contrasts and of AI conduct (run `chb_prereview_20261110`, November 2026). Zenodo record version 1.2.0 or later holds their inputs in `08_analysis_ready/further_checks/` (one folder per check) and their 49 result tables in `08_analysis_ready/results_tables/chb_prereview_*.csv`. The scripts read the unpacked record from `../data` and need most of its archives:
+
+```bash
+python -m repro.download --all --dest data      # from the repository root
+cd analysis
+pip install -r requirements-fit.txt
+python public_inputs.py --zenodo ../data
+python -m pytest tests -q                        # 87 unit tests of the check scripts; no data needed
+```
+
+Each script writes a run record to `runs/chb_prereview_20261110/<check>/` and its tables to `runs/chb_prereview_20261110/tables/` (or to the `--out` folder it is given). The model-based checks fit 4 chains at the settings of the model they extend; each fit took 30 to 80 seconds on a laptop with 4 chains in parallel, and the seven thread-entry fits about 4 minutes each.
+
+| Check | Script | Commands (from `analysis/`) | Inputs beyond record 1.1.0 (`further_checks/`) |
+|---|---|---|---|
+| Direct-reply association by account type; RQ1 contrast from the thread-split model | `chb_prereview_a1_direct_reply_by_type.py` | `python -m scripts.diagnostics.review_choice_models_direct_reply --config analysis.public-rq2.yaml --fit-dir F/a1_a2/fit --out OUT/original_direct_reply`<br>`python -m scripts.diagnostics.chb_prereview_a1_direct_reply_by_type run --config analysis.public-rq2.yaml --fit-dir F/a1_a2/fit --admitted-dir F/a1_a2/admitted --original-direct-reply OUT/original_direct_reply --out OUT` | `a1_a2/fit/`: posterior draws and settings of the thread-split refit; `a1_a2/admitted/`: the reported tables it is compared with. To refit the model instead (about 45 minutes on 4 cores): `python -m scripts.diagnostics.review_choice_models_rq2_threads --help`, variant `split_direct_child` |
+| Distinct downvoted targets | `chb_prereview_a3_downvote_targets.py` | `python -m scripts.diagnostics.chb_prereview_a3_downvote_targets` | none |
+| Comment timing and direct replies by voucher progress | `chb_prereview_a4_incentive_timing.py` | `python -m scripts.diagnostics.chb_prereview_a4_incentive_timing run` | `a4_incentive_timing/event_counts.csv` (see below) |
+| AI text features | `chb_prereview_a5_ai_text.py` | `python -m scripts.diagnostics.chb_prereview_a5_ai_text` (needs `vaderSentiment==3.3.2`) | `a5_ai_text/review_ai_conduct_comments.csv`, a comparison table |
+| AI accounts' own exchange labels | `chb_prereview_a6_ai_relation_labels.py` | `python -m scripts.diagnostics.chb_prereview_a6_ai_relation_labels` | none |
+| AI accounts' relationship cards | `chb_prereview_a7_ai_social_cards.py` | `python -m scripts.diagnostics.chb_prereview_a7_ai_social_cards finalize` | `a7_ai_social_cards/` (see below) |
+| Content criticism with classification error | `chb_prereview_a10_content_misclass.py` | `... fit --variant V` for `content_parent_misclass_cell`, `content_only_misclass_cell`, `content_only_sol`; then `... collect` | `a10_content_misclass/`: human validation counts by community and target authorship |
+| Contribution-level downvotes | `chb_prereview_a12_contribution_downvotes.py` | `... frame`; `... fit --variant V` for `author`, `author_root`, `author_root_wide`; `... collect` | none |
+| Thread entry with feed position and persona disposition | `chb_prereview_a13_entry_covariates.py` | `python -m scripts.publication_analysis.rq1b prepare --config analysis.public-rq1.yaml --run-id rq1b`, then with `A="--panel public_runs/rq1b/outputs/tables/rq1b_opportunity_panel.parquet --position F/a13_entry_covariates/feed_position.csv --accounts ../data/01_accounts/accounts.csv --root-scores F/a13_entry_covariates/root_detoxify.csv --out OUT"`: `... fit --spec S $A` for the seven specifications listed by `--help`; `... tables $A`; `... crosscheck --panel ... --events public_inputs/browser/session_events.parquet --position ... --out OUT` | `a13_entry_covariates/`: feed positions and root-post toxicity scores. `crosscheck` recomputes all 5,668 feed positions from the public telemetry |
+| Parent disagreement annotation | `chb_prereview_a15_parent_disagreement.py` | `... build`; `... collect`; `... clipping` | `a15_parent_disagreement/`: the labels of the reported annotation passes |
+| Criticism adjusted for parent disagreement | `chb_prereview_a14_criticism_parent_adjusted.py` | after the A15 commands: `... fit --variant V` for `baseline`, `pooled`, `by_authorship`, `pooled_prior1`, `by_authorship_prior1`, `pooled_nonroot`; `... collect`; `... collect-sensitivity` | none beyond A15 |
+| RQ1 projection for non-root targets | `chb_prereview_a19_rq1_nonroot.py` | `python -m scripts.publication_analysis prepare-choice --config analysis.public-rq1.yaml --run-id rq1`<br>`python -m scripts.diagnostics.chb_prereview_a19_rq1_nonroot --rq1-dir public_runs/rq1/outputs --out OUT` | `a19_a21_rq1_m1/M1.nc`: posterior draws of the reported M1 fit |
+| Within-community RQ1 estimand | `chb_prereview_a21_rq1_within_community.py` | `python -m scripts.diagnostics.chb_prereview_a21_rq1_within_community --rq1-dir public_runs/rq1/outputs --admitted-parameters F/a19_a21_rq1_m1/review_choice_models_rq1_parameters.csv --out OUT` | as A19 |
+| Regeneration of AI replies with and without the marker | `chb_prereview_a20_analysis.py` (analysis), `chb_prereview_a20_marker.py` (generation) | `python -m scripts.diagnostics.chb_prereview_a20_analysis items`; `... collect` | `a20_marker/`: per-draft outcomes, masked draft text and disagreement labels |
+
+`F` stands for `../data/08_analysis_ready/further_checks`, `OUT` for an output folder, and `...` for `python -m scripts.diagnostics.<script name>`.
+
+Three steps used material that is not public. Their outputs are in the record, and the public stages start from them:
+
+- **Comment counts over the whole timeline (A4, stage `private-counts`).** The voucher bands count every comment a participant wrote before a reply, including comments from the excluded interval of 19 to 28 May 2026, which are not released. `event_counts.csv` holds the count for each of the 2,143 analysed replies. The `run` stage also reports the same shares counted from the released windows only.
+- **Daily relationship-card summaries (A7, stage `extract`).** The trajectory over 26 daily snapshots reads snapshots that are not released. `social_card_snapshot_aggregates.csv` holds the summaries by snapshot, community and dyad. The `finalize` stage recomputes the final snapshot from the public cards and checks that it agrees.
+- **Regeneration (A20, `chb_prereview_a20_marker.py` and stage `frame`).** Generating the drafts needs the experiment database, the platform client as it ran, and the generator model; reconstructing the prompts reads participant text from outside the released windows. The script is included as documentation of the procedure. `frame.csv` and `drafts_masked.jsonl` hold the outcome of every draft and the masked draft text.
+
+Two annotation passes (A15 and the draft coding in A20) called GPT-5.6 Sol through the Codex command-line interface. The `annotate` stages are included, but a rerun gives a new annotation that need not match label for label; `collect` therefore reads the deposited labels unless the run folder holds new ones. The thread-entry `extract` stage (A13) read the raw browser sessions; its feed positions are reproduced exactly by `crosscheck` from the public telemetry, and it scored the root posts that had no public Detoxify score.
+
+Checks against the reported tables, November 2026 (staged record 1.2.0, Linux x86-64): all 49 reported tables were regenerated with the commands above. Thirty-six were byte-identical to the reported tables, including every estimate table of the refitted models (A10, A12, A13, A14; same machine and package versions as the reported fits, so the draws repeated exactly; on other hardware expect agreement within Monte Carlo error). The five diagnostics tables differed only in their timing columns. The eight other tables of the posterior projections (A1 and A2, A19, A21) agreed to within 3e-14; the A1 table also names the checksum of the posterior file, which differs because the deposited file omits the pointwise log-likelihood.
 
 ## Inputs (original route)
 

@@ -2,9 +2,10 @@
 """Download the Zenodo record, unpack it into ``data/`` and verify every file.
 
 By default only the two archives the figures and tables read are fetched
-(``07_annotations.zip`` and ``08_analysis_ready.zip``, about 3 MB). ``--fit``
+(``07_annotations.zip`` and ``08_analysis_ready.zip``, about 3 MB up to record version 1.1.0, about 26 MB from 1.2.0). ``--fit``
 adds the browser telemetry and experiment configuration that the model refits
-in ``analysis/`` also read (about 70 MB). ``--all`` fetches the complete record (about 130 MB). The newest
+in ``analysis/`` also read (about 70 MB more). ``--all`` fetches the complete record (about 155 MB); the further
+checks of Supplementary Note 11 (``analysis/README.md``) need it and record version 1.2.0 or later. The newest
 published version of the record is used unless ``--record`` names a version.
 Unpacked files are checked against the record's ``SHA256SUMS``.
 """
